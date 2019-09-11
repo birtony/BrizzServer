@@ -1,6 +1,6 @@
 # Brizz Server
 
-## ```Always commit to the develop branch first!```
+## ```Always commit to the develop branch only!```
 
 ## Some of the Available Methods:
 - Get All Users: (/api/users)
