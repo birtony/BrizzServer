@@ -1,4 +1,4 @@
-# BrizzServer Server
+# Brizz Server
 
 ## ```Always commit to the develop branch first!```
 
