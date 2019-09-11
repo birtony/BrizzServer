@@ -90,7 +90,7 @@ app.get("/", (req, res) => {
 // Get All Users
 app.get(
   "/api/users",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", { session: false, failureFlash: true }),
   (req, res) => {
     // Call the Manager Method
     m.userGetAll()
