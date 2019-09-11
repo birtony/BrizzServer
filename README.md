@@ -1,6 +1,6 @@
 # BrizzServer Server
 
-## ```*Always commit to the develop branch first!*```
+## ```Always commit to the develop branch first!```
 
 Some of the Available Methods:
 
