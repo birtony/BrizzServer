@@ -2,7 +2,7 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-// User Schema
+// Interests Schema
 module.exports = new Schema({
   accounting: Boolean,
   administration: Boolean,
