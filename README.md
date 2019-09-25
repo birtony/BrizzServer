@@ -1,6 +1,7 @@
 # Brizz Server
 
-## ```Always commit to the develop branch only!```
+## Data Model Structure
+![Data Model Structure](https://github.com/birtony/BrizzServer/blob/master/Assets/DataModel.png)
 
 ## Available Methods
 ### User Methods:
@@ -16,8 +17,7 @@ Login User | `/api/users/login` | Post
 Update User | `/api/users/:username/update` | Post
 
 ### Program Methods:
-- Get All Programs: https://brizz-server.herokuapp.com/api/programs
-
-## Data Model Structure
-![Data Model Structure](https://github.com/birtony/BrizzServer/blob/master/Assets/DataModel.png)
-  
+Methods | URL | Type
+:------- | :--- | :----:
+Get All Programs | https://brizz-server.herokuapp.com/api/programs | Get
+Get a Program by Id | `/api/programs/:programId` | Get
