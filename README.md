@@ -8,7 +8,7 @@
 
 Methods | URL | Type
 :------- | :--- | :----:
-Get All Users | https://brizz-server.herokuapp.com/api/users | Get
+Get All Users | `/api/users` | Get
 Get a User by ID | `/api/users/:userId` | Get
 Get a User by Username | `/api/users/username/:username"` | Get
 Activate User | `/api/users/activate` | Post
@@ -19,5 +19,5 @@ Update User | `/api/users/:username/update` | Post
 ### Program Methods:
 Methods | URL | Type
 :------- | :--- | :----:
-Get All Programs | https://brizz-server.herokuapp.com/api/programs | Get
+Get All Programs | `/api/programs` | Get
 Get a Program by Id | `/api/programs/:programId` | Get
