@@ -20,14 +20,14 @@ module.exports = new Schema({
   birthDate: String,
   gender: String,
   complete: Boolean,
-  lastUse: String,
+  lastUse: Date,
   interests: Interests,
   ielts: Number,
   international: Boolean,
   originCountry: String,
   yearBudget: {
     type: String,
-    enum: ["UNDEFINED", "1k-5k", "5k-10k", "10k-15k", "15k-20k", "25k+"],
+    enum: ["UNDEFINED", "1k-5k", "5k-10k", "10k-15k", "15k-20k", "20k-25k", "25k+"],
     default: ["UNDEFINED"]
-  }
+  },
 });
