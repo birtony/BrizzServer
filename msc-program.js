@@ -13,8 +13,9 @@ module.exports = new Schema({
   },
   email: String,
   phone: String,
-  cost: Number,
+  yearlyCost: Number,
   description: String,
   requiredIelts: Number,
-  requiredGpa: Number
+  requiredGpa: Number,
+  interests: Interests
 });
