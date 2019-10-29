@@ -66,3 +66,5 @@ a.out
 *.o
 *.jpg
 *.png
+package-lock.json
+package.json
