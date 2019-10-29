@@ -28,6 +28,6 @@ module.exports = new Schema({
   yearBudget: {
     type: String,
     enum: ["UNDEFINED", "1k-5k", "5k-10k", "10k-15k", "15k-20k", "20k-25k", "25k+"],
-    default: ["UNDEFINED"]
+    default: "UNDEFINED",
   },
 });
