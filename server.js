@@ -1,16 +1,29 @@
-// Setup
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const path = require("path");
 const bodyParser = require("body-parser");
+const app = express();
 const HTTP_PORT = process.env.PORT || 8080;
 
-// Add Support for CORS
+const manager = require("./manager.js");
+
+const m = manager(
+  "mongodb+srv://BrizzAdmin:You5iv3LkoJFF1cK@brizz-bodhi.mongodb.net/BrizzDB?retryWrites=true&w=majority",
+    { useUnifiedTopology: true },
+    () => console.log("Connected to DB")
+);
+
+app.use(bodyParser.json());
 app.use(cors());
 
-// Passport.js components
-var jwt = require("jsonwebtoken");
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+
+//JWT-----------------------------------------------------------------------------------------------------
+var jwt = require('jsonwebtoken');
 var passport = require("passport");
 var passportJWT = require("passport-jwt");
 
@@ -20,80 +33,36 @@ var JwtStrategy = passportJWT.Strategy;
 
 // Configure its options
 var jwtOptions = {};
-// jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-// IMPORTANT - this secret should be a long, unguessable string
-// (ideally stored in a "protected storage" area on the
-// web server, a topic that is beyond the scope of this course)
-// We suggest that you generate a random 64-character string
-// using the following online tool:
-// https://lastpass.com/generatepassword.php
-const secretOrKey = "big-long-string-from-lastpass.com/generatepassword.php";
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
 
-// Add Support for Incoming JSON Entities
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(function(req, res, next) {
-  if (
-    req.headers &&
-    req.headers.authorization &&
-    req.headers.authorization.split(" ")[0] === "JWT"
-  ) {
-    jwt.verify(req.headers.authorization.split(" ")[1], secretOrKey, function(
-      err,
-      decode
-    ) {
-      if (err) req.user = undefined;
-      req.user = decode;
-      next();
-    });
-  } else {
-    req.user = undefined;
-    next();
-  }
+jwtOptions.secretOrKey = 'big-long-string-from-lastpass.com/generatepassword.php';
+
+var strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
+    console.log('payload received', jwt_payload);
+
+    if (jwt_payload) {
+    // Attach the token's contents to the request
+    // It will be available as "req.user" in the route handler functions
+        next(null, {
+            _id: jwt_payload._id
+        });
+    } else {
+        next(null, false);
+    }
 });
-
-app.use(function(req, res, next) {
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type, Authorization"
-  );
-  next();
-});
-
 // Activate the security system
-
-app.use((req, res, next) => {
-  if (req.body) console.log("req.body:\n", req.body);
-  if (req.headers) console.log("req.headers:\n", req.headers);
-  if (req.query) console.log("req.query:\n", req.query);
-  console.log(`Received a ${req.method} request from ${req.ip} for ${req.url}`);
-  next();
-});
-
-// Data Model
-const manager = require("./manager.js");
-
-// Persistent Store
-// For MondoDB Atlas Database
-const m = manager(
-  "mongodb+srv://BrizzAdmin:hP0BsTS7PXWFWZj1@brizz-bodhi.mongodb.net/BrizzDB?retryWrites=true&w=majority"
-);
-
-// App's Home Page for Browser Clients
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "/index.html"));
-});
+passport.use(strategy);
+app.use(passport.initialize());
 
 // ***** User Methods *****
 
 // Get All Users
 app.get(
   "/api/users",
-  passport.authenticate("jwt", { session: false, failureFlash: true }),
+  passport.authenticate("jwt", { session: false }),
   (req, res) => {
     // Call the Manager Method
-    m.userGetAll()
+    m.usersGetAll()
       .then(data => {
         res.json(data);
       })
@@ -109,7 +78,7 @@ app.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     // Call the Manager Method
-    m.userGetById(req.params.userId)
+    m.usersGetById(req.params.userId)
       .then(data => {
         res.json(data);
       })
@@ -125,7 +94,7 @@ app.get(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     // Call the Manager Method
-    m.centerGetByUsername(req.params.username)
+    m.usersGetByUsername(req.params.username)
       .then(data => {
         res.json(data);
       })
