@@ -1,12 +1,12 @@
 // Setup
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-mongoose.set("useNewUrlParser", true);
-mongoose.set("useFindAndModify", false);
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
 
 // Load the Schemas
-const userSchema = require("./msc-user.js");
-const ProgramSchema = require("./msc-program.js");
+const userSchema = require('./msc-user.js');
+const ProgramSchema = require('./msc-program.js');
 
 module.exports = function(mongoDBConnectionString) {
   // Defined on Connection to the New Database
@@ -17,15 +17,15 @@ module.exports = function(mongoDBConnectionString) {
     // Establish Connection With the Database
     connect: function() {
       return new Promise(function(resolve, reject) {
-        let db = mongoose.createConnection(mongoDBConnectionString);
+        const db = mongoose.createConnection(mongoDBConnectionString);
 
-        db.on("error", error => {
+        db.on('error', (error) => {
           reject(error);
         });
 
-        db.once("open", () => {
-          Users = db.model("Users", userSchema, "user");
-          Programs = db.model("Programs", ProgramSchema, "program");
+        db.once('open', () => {
+          Users = db.model('Users', userSchema, 'user');
+          Programs = db.model('Programs', ProgramSchema, 'program');
           resolve();
         });
       });
@@ -36,7 +36,7 @@ module.exports = function(mongoDBConnectionString) {
       return new Promise(function(resolve, reject) {
         // Fetch All Documents
         Users.find()
-          .sort({ lastName: "asc", firstName: "asc" })
+          .sort({ lastName: 'asc', firstName: 'asc' })
           .exec((error, items) => {
             if (error) {
               // Query Error
@@ -62,7 +62,7 @@ module.exports = function(mongoDBConnectionString) {
             // If Found, One Object Will Be Returned
             return resolve(item);
           } else {
-            return reject("Not found");
+            return reject('Not found');
           }
         });
       });
@@ -82,7 +82,7 @@ module.exports = function(mongoDBConnectionString) {
             // If Found, One Object Will Be Returned
             return resolve(item);
           } else {
-            return reject("Not found");
+            return reject('Not found');
           }
         });
       });
@@ -96,13 +96,13 @@ module.exports = function(mongoDBConnectionString) {
         // { userName: xxx, password: yyy, passwordConfirm: yyy }
 
         if (userData.password != userData.passwordConfirm) {
-          return reject("Passwords do not match");
+          return reject('Passwords do not match');
         }
 
         // Generate a "salt" value
-        var salt = bcrypt.genSaltSync(10);
+        const salt = bcrypt.genSaltSync(10);
         // Hash the result
-        var hash = bcrypt.hashSync(userData.password, salt);
+        const hash = bcrypt.hashSync(userData.password, salt);
 
         // Attempt to update the user account
         Users.findOneAndUpdate(
@@ -117,13 +117,13 @@ module.exports = function(mongoDBConnectionString) {
             // Check for an item
             if (item) {
               // Edited object will be returned
-              //return resolve(item);
+              // return resolve(item);
               // Alternatively...
-              return resolve("User was activated");
+              return resolve('User was activated');
             } else {
-              return reject("User activation - not found");
+              return reject('User activation - not found');
             }
-          }
+          },
         ); // Users.findOneAndUpdate
       }); // return new Promise
     }, // usersActivate
@@ -136,39 +136,38 @@ module.exports = function(mongoDBConnectionString) {
         // { userName: xxx, fullName: aaa, password: yyy, passwordConfirm: yyy }
 
         if (userData.password != userData.passwordConfirm) {
-          return reject("Passwords do not match");
+          return reject('Passwords do not match');
         }
 
         // Generate a "salt" value
-        var salt = bcrypt.genSaltSync(10);
+        const salt = bcrypt.genSaltSync(10);
         // Hash the result
-        var hash = bcrypt.hashSync(userData.password, salt);
+        const hash = bcrypt.hashSync(userData.password, salt);
 
         // Update the incoming data
         userData.password = hash;
 
         // Create a new user account document
-        let newUser = new Users(userData);
+        const newUser = new Users(userData);
 
         // Attempt to save
-        newUser.save(error => {
+        newUser.save((error) => {
           if (error) {
             if (error.code == 11000) {
-              reject("User creation - cannot create; user already exists");
+              reject('User creation - cannot create; user already exists');
             } else {
               reject(`User creation - ${error.message}`);
             }
           } else {
             resolve(newUser);
           }
-        }); //newUser.save
+        }); // newUser.save
       }); // return new Promise
     }, // usersRegister
 
     // Users
     usersLogin: function(userData) {
       return new Promise(function(resolve, reject) {
-        console.log(userData);
         // Incoming data package has user name (email address) and password
         // { userName: xxx, password: yyy }
 
@@ -180,17 +179,14 @@ module.exports = function(mongoDBConnectionString) {
           // Check for an item
           if (item) {
             // Compare password with stored value
-            let isPasswordMatch = bcrypt.compareSync(
-              userData.password,
-              item.password
-            );
+            const isPasswordMatch = bcrypt.compareSync(userData.password, item.password);
             if (isPasswordMatch) {
               return resolve(item);
             } else {
-              return reject("Login was not successful");
+              return reject('Login was not successful');
             }
           } else {
-            return reject("Login - not found");
+            return reject('Login - not found');
           }
         }); // Users.findOneAndUpdate
       }); // return new Promise
@@ -207,9 +203,9 @@ module.exports = function(mongoDBConnectionString) {
           // Check for an item
           if (item) {
             // Success message will be returned
-            return resolve("User updated");
+            return resolve('User updated');
           } else {
-            return reject("Not found");
+            return reject('Not found');
           }
         });
       });
@@ -222,7 +218,7 @@ module.exports = function(mongoDBConnectionString) {
       return new Promise(function(resolve, reject) {
         // Fetch All Documents
         Programs.find()
-          .sort({ name: "asc" })
+          .sort({ name: 'asc' })
           .exec((error, items) => {
             if (error) {
               // Query Error
@@ -248,7 +244,7 @@ module.exports = function(mongoDBConnectionString) {
             // If Found, One Object Will Be Returned
             return resolve(item);
           } else {
-            return reject("Not found");
+            return reject('Not found');
           }
         });
       });
@@ -267,10 +263,10 @@ module.exports = function(mongoDBConnectionString) {
             // If Found, One Object Will Be Returned
             return resolve(item.complete);
           } else {
-            return reject("Not found");
+            return reject('Not found');
           }
         });
       });
-    }
+    },
   };
 };
