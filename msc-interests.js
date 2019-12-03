@@ -1,6 +1,6 @@
 // Setup
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 // Interests Schema
 module.exports = new Schema({
@@ -36,5 +36,5 @@ module.exports = new Schema({
   nursing: Boolean,
   socialService: Boolean,
   tourism: Boolean,
-  veterinary: Boolean
+  veterinary: Boolean,
 });
