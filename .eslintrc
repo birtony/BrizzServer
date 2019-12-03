@@ -1,0 +1,35 @@
+{
+  "extends": ["google"],
+  "plugins": ["fp", "prettier"],
+  "env": {
+    "es2017": true
+  },
+  "rules": {
+    "max-lines": ["warn", 250],
+    "max-lines-per-function": ["warn", 300],
+    "complexity": ["warn", 5],
+    "max-nested-callbacks": ["warn", 2],
+    "max-depth": ["warn", 3],
+    "fp/no-mutation": [
+      "warn",
+      {
+        "commonjs": true
+      }
+    ],
+    "no-param-reassign": "error",
+    "fp/no-mutating-assign": "error",
+    "fp/no-mutating-methods": "error",
+    "fp/no-delete": "error",
+    "fp/no-loops": "warn",
+    "max-params": ["error", 3],
+    "import/first": "error",
+    "quotes": ["error", "single", "avoid-escape"],
+    "indent": ["error", 2],
+    "semi": ["error", "always"],
+    "camelcase": [0, { "properties": "never" }],
+    "max-len": ["error", 150],
+    "linebreak-style": ["error", "unix"],
+    "require-jsdoc": "off",
+    "object-curly-spacing": [2, "always"]
+  }
+}

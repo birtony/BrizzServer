@@ -1,6 +1,7 @@
 // Setup
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const Interests = require('./msc-interests.js');
 
 // Program Schema
 module.exports = new Schema({
@@ -9,12 +10,13 @@ module.exports = new Schema({
   address: String,
   location: {
     lat: Number,
-    lon: Number
+    lon: Number,
   },
   email: String,
   phone: String,
-  cost: Number,
+  yearlyCost: Number,
   description: String,
   requiredIelts: Number,
-  requiredGpa: Number
+  requiredGpa: Number,
+  interests: Interests,
 });
