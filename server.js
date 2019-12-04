@@ -154,7 +154,7 @@ app.post(
 // ***** Program Methods *****
 
 // Get All Programs
-app.get('/api/programs', passport.authenticate('jft', { session: false }), (req, res) => {
+app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req, res) => {
   if (req.user) {
     // Call the Manager Method
     m.programGetAll()
@@ -172,7 +172,7 @@ app.get('/api/programs', passport.authenticate('jft', { session: false }), (req,
 // Get One Program
 app.get(
   '/api/programs/:programId',
-  passport.authenticate('jft', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   (req, res) => {
     if (req.user) {
       // Call the Manager Method

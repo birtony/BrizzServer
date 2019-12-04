@@ -58,19 +58,9 @@ module.exports = function (mongoDBConnectionString) {
         // two identical passwords
         // { email: xxx, password: yyy, passwordConfirm: yyy }
 
-        // check for an existing email
-        Users.find({ email: userData.email }, (err, data) => {
-          if (err) {
-            return reject(new Error(`User creation - ${err.message}`));
-          }
-          if (data.length > 0) {
-            return reject(new Error('This email is already in use'));
-          }
-        });
-
         // check if passwords match
         if (userData.password !== userData.passwordConfirm) {
-          return reject(new Error('Passwords do not match'));
+          reject(new Error('Passwords do not match'));
         }
 
         // Generate a "salt" value
