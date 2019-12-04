@@ -1,5 +1,5 @@
 {
-  "extends": ["google"],
+  "extends": ["google", "standard"],
   "plugins": ["fp", "prettier"],
   "env": {
     "es2017": true
