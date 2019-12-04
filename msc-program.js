@@ -10,7 +10,7 @@ module.exports = new Schema({
   address: String,
   location: {
     lat: Number,
-    lon: Number,
+    lon: Number
   },
   email: String,
   phone: String,
@@ -18,5 +18,5 @@ module.exports = new Schema({
   description: String,
   requiredIelts: Number,
   requiredGpa: Number,
-  interests: Interests,
+  interests: Interests
 });

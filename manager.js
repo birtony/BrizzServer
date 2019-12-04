@@ -8,17 +8,16 @@ mongoose.set('useFindAndModify', false);
 const userSchema = require('./msc-user.js');
 const ProgramSchema = require('./msc-program.js');
 
-module.exports = function(mongoDBConnectionString) {
+module.exports = function (mongoDBConnectionString) {
   // Defined on Connection to the New Database
   let Users;
   let Programs;
 
   return {
     // Establish Connection With the Database
-    connect: function() {
-      return new Promise(function(resolve, reject) {
+    connect: function () {
+      return new Promise(function (resolve, reject) {
         const db = mongoose.createConnection(mongoDBConnectionString);
-
         db.on('error', (error) => {
           reject(error);
         });
@@ -31,26 +30,9 @@ module.exports = function(mongoDBConnectionString) {
       });
     },
 
-    // Get All Users
-    usersGetAll: function() {
-      return new Promise(function(resolve, reject) {
-        // Fetch All Documents
-        Users.find()
-          .sort({ lastName: 'asc', firstName: 'asc' })
-          .exec((error, items) => {
-            if (error) {
-              // Query Error
-              return reject(error.message);
-            }
-            // If Found, a Collection Will Be Returned
-            return resolve(items);
-          });
-      });
-    },
-
     // Get One User By Id
-    usersGetById: function(itemId) {
-      return new Promise(function(resolve, reject) {
+    usersGetById: function (itemId) {
+      return new Promise(function (resolve, reject) {
         // Find One Specific Document
         Users.findById(itemId, (error, item) => {
           if (error) {
@@ -62,81 +44,33 @@ module.exports = function(mongoDBConnectionString) {
             // If Found, One Object Will Be Returned
             return resolve(item);
           } else {
-            return reject('Not found');
+            return reject(new Error('Not found'));
           }
         });
       });
     },
-
-    // Get One User By Username
-    usersGetByUsername: function(username) {
-      return new Promise(function(resolve, reject) {
-        // Find One Specific Document
-        Users.findOne({ username: username }, (error, item) => {
-          if (error) {
-            // Match Is Not Found
-            return reject(error.message);
-          }
-          // Check For an Item
-          if (item) {
-            // If Found, One Object Will Be Returned
-            return resolve(item);
-          } else {
-            return reject('Not found');
-          }
-        });
-      });
-    },
-
-    // User Activate
-    usersActivate: function(userData) {
-      return new Promise(function(resolve, reject) {
-        // Incoming data package has username (email address),
-        // two identical passwords
-        // { userName: xxx, password: yyy, passwordConfirm: yyy }
-
-        if (userData.password != userData.passwordConfirm) {
-          return reject('Passwords do not match');
-        }
-
-        // Generate a "salt" value
-        const salt = bcrypt.genSaltSync(10);
-        // Hash the result
-        const hash = bcrypt.hashSync(userData.password, salt);
-
-        // Attempt to update the user account
-        Users.findOneAndUpdate(
-          { username: userData.username },
-          { password: hash, statusActivated: true },
-          { new: true },
-          (error, item) => {
-            if (error) {
-              // Cannot edit item
-              return reject(`User activation - ${error.message}`);
-            }
-            // Check for an item
-            if (item) {
-              // Edited object will be returned
-              // return resolve(item);
-              // Alternatively...
-              return resolve('User was activated');
-            } else {
-              return reject('User activation - not found');
-            }
-          },
-        ); // Users.findOneAndUpdate
-      }); // return new Promise
-    }, // usersActivate
 
     // Users Register
-    usersRegister: function(userData) {
-      return new Promise(function(resolve, reject) {
+    usersRegister: function (userData) {
+      // debugged
+      return new Promise(function (resolve, reject) {
         // Incoming data package has user name (email address), full name,
         // two identical passwords
-        // { userName: xxx, fullName: aaa, password: yyy, passwordConfirm: yyy }
+        // { email: xxx, password: yyy, passwordConfirm: yyy }
 
-        if (userData.password != userData.passwordConfirm) {
-          return reject('Passwords do not match');
+        // check for an existing email
+        Users.find({ email: userData.email }, (err, data) => {
+          if (err) {
+            return reject(new Error(`User creation - ${err.message}`));
+          }
+          if (data.length > 0) {
+            return reject(new Error('This email is already in use'));
+          }
+        });
+
+        // check if passwords match
+        if (userData.password !== userData.passwordConfirm) {
+          return reject(new Error('Passwords do not match'));
         }
 
         // Generate a "salt" value
@@ -153,10 +87,10 @@ module.exports = function(mongoDBConnectionString) {
         // Attempt to save
         newUser.save((error) => {
           if (error) {
-            if (error.code == 11000) {
-              reject('User creation - cannot create; user already exists');
+            if (error.code === 11000) {
+              reject(new Error('User creation - cannot create; user already exists'));
             } else {
-              reject(`User creation - ${error.message}`);
+              reject(new Error(`User creation - ${error.message}`));
             }
           } else {
             resolve(newUser);
@@ -165,16 +99,15 @@ module.exports = function(mongoDBConnectionString) {
       }); // return new Promise
     }, // usersRegister
 
-    // Users
-    usersLogin: function(userData) {
-      return new Promise(function(resolve, reject) {
+    // Users login // debugged
+    usersLogin: function (userData) {
+      return new Promise(function (resolve, reject) {
         // Incoming data package has user name (email address) and password
-        // { userName: xxx, password: yyy }
-
-        Users.findOne({ username: userData.username }, (error, item) => {
+        // { email: xxx, password: yyy }
+        Users.findOne({ email: userData.email }, (error, item) => {
           if (error) {
             // Query error
-            return reject(`Login - ${error.message}`);
+            return reject(new Error(`Login - ${error.message}`));
           }
           // Check for an item
           if (item) {
@@ -183,18 +116,18 @@ module.exports = function(mongoDBConnectionString) {
             if (isPasswordMatch) {
               return resolve(item);
             } else {
-              return reject('Login was not successful');
+              return reject(new Error('Login was not successful'));
             }
           } else {
-            return reject('Login - not found');
+            return reject(new Error('Login - not found'));
           }
         }); // Users.findOneAndUpdate
       }); // return new Promise
     }, // usersLogin
 
-    // User Update
-    userUpdate: function(_id, user) {
-      return new Promise(function(resolve, reject) {
+    // User Update // debugged
+    userUpdate: function (_id, user) {
+      return new Promise(function (resolve, reject) {
         Users.findByIdAndUpdate(_id, user, { new: true }, (error, item) => {
           if (error) {
             // Cannot edit item
@@ -205,7 +138,7 @@ module.exports = function(mongoDBConnectionString) {
             // Success message will be returned
             return resolve('User updated');
           } else {
-            return reject('Not found');
+            return reject(new Error('Not found'));
           }
         });
       });
@@ -214,8 +147,8 @@ module.exports = function(mongoDBConnectionString) {
     // *** Program Functions ***
 
     // Get All Programs
-    programGetAll: function() {
-      return new Promise(function(resolve, reject) {
+    programGetAll: function () {
+      return new Promise(function (resolve, reject) {
         // Fetch All Documents
         Programs.find()
           .sort({ name: 'asc' })
@@ -231,8 +164,8 @@ module.exports = function(mongoDBConnectionString) {
     },
 
     // Get One Center By Id
-    programGetById: function(itemId) {
-      return new Promise(function(resolve, reject) {
+    programGetById: function (itemId) {
+      return new Promise(function (resolve, reject) {
         // Find One Specific Document
         Programs.findById(itemId, (error, item) => {
           if (error) {
@@ -248,25 +181,6 @@ module.exports = function(mongoDBConnectionString) {
           }
         });
       });
-    },
-
-    // Check for complete
-    complete: function(_id) {
-      return new Promise(function(resolve, reject) {
-        Users.findById(_id, (error, item) => {
-          if (error) {
-            // Match Is Not Found
-            return reject(error.message);
-          }
-          // Check For an Item
-          if (item) {
-            // If Found, One Object Will Be Returned
-            return resolve(item.complete);
-          } else {
-            return reject('Not found');
-          }
-        });
-      });
-    },
+    }
   };
 };

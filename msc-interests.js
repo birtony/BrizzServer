@@ -36,5 +36,5 @@ module.exports = new Schema({
   nursing: Boolean,
   socialService: Boolean,
   tourism: Boolean,
-  veterinary: Boolean,
+  veterinary: Boolean
 });
