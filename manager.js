@@ -8,15 +8,15 @@ mongoose.set('useFindAndModify', false);
 const userSchema = require('./msc-user.js');
 const ProgramSchema = require('./msc-program.js');
 
-module.exports = function (mongoDBConnectionString) {
+module.exports = function(mongoDBConnectionString) {
   // Defined on Connection to the New Database
   let Users;
   let Programs;
 
   return {
     // Establish Connection With the Database
-    connect: function () {
-      return new Promise(function (resolve, reject) {
+    connect: function() {
+      return new Promise(function(resolve, reject) {
         const db = mongoose.createConnection(mongoDBConnectionString);
         db.on('error', (error) => {
           reject(error);
@@ -31,8 +31,8 @@ module.exports = function (mongoDBConnectionString) {
     },
 
     // Get One User By Id
-    usersGetById: function (itemId) {
-      return new Promise(function (resolve, reject) {
+    usersGetById: function(itemId) {
+      return new Promise(function(resolve, reject) {
         // Find One Specific Document
         Users.findById(itemId, (error, item) => {
           if (error) {
@@ -51,22 +51,12 @@ module.exports = function (mongoDBConnectionString) {
     },
 
     // Users Register
-    usersRegister: function (userData) {
+    usersRegister: function(userData) {
       // debugged
-      return new Promise(function (resolve, reject) {
+      return new Promise(function(resolve, reject) {
         // Incoming data package has user name (email address), full name,
         // two identical passwords
         // { email: xxx, password: yyy, passwordConfirm: yyy }
-
-        // check for an existing email
-        Users.find({ email: userData.email }, (err, data) => {
-          if (err) {
-            return reject(new Error(`User creation - ${err.message}`));
-          }
-          if (data.length > 0) {
-            return reject(new Error('This email is already in use'));
-          }
-        });
 
         // check if passwords match
         if (userData.password !== userData.passwordConfirm) {
@@ -100,8 +90,8 @@ module.exports = function (mongoDBConnectionString) {
     }, // usersRegister
 
     // Users login // debugged
-    usersLogin: function (userData) {
-      return new Promise(function (resolve, reject) {
+    usersLogin: function(userData) {
+      return new Promise(function(resolve, reject) {
         // Incoming data package has user name (email address) and password
         // { email: xxx, password: yyy }
         Users.findOne({ email: userData.email }, (error, item) => {
@@ -126,8 +116,8 @@ module.exports = function (mongoDBConnectionString) {
     }, // usersLogin
 
     // User Update // debugged
-    userUpdate: function (_id, user) {
-      return new Promise(function (resolve, reject) {
+    userUpdate: function(_id, user) {
+      return new Promise(function(resolve, reject) {
         Users.findByIdAndUpdate(_id, user, { new: true }, (error, item) => {
           if (error) {
             // Cannot edit item
@@ -147,8 +137,8 @@ module.exports = function (mongoDBConnectionString) {
     // *** Program Functions ***
 
     // Get All Programs
-    programGetAll: function () {
-      return new Promise(function (resolve, reject) {
+    programGetAll: function() {
+      return new Promise(function(resolve, reject) {
         // Fetch All Documents
         Programs.find()
           .sort({ name: 'asc' })
@@ -164,8 +154,8 @@ module.exports = function (mongoDBConnectionString) {
     },
 
     // Get One Center By Id
-    programGetById: function (itemId) {
-      return new Promise(function (resolve, reject) {
+    programGetById: function(itemId) {
+      return new Promise(function(resolve, reject) {
         // Find One Specific Document
         Programs.findById(itemId, (error, item) => {
           if (error) {
@@ -181,6 +171,6 @@ module.exports = function (mongoDBConnectionString) {
           }
         });
       });
-    }
+    },
   };
 };
