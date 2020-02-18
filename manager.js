@@ -172,5 +172,17 @@ module.exports = function(mongoDBConnectionString) {
         });
       });
     },
+
+    // Add new Program
+    programAdd: function(someId) {
+      return new Promise(function(resolve, reject) {
+        Programs.create(someId, (error, object) => {
+          if (error) {
+            return reject(error.message);
+          }
+          return resolve(object);
+        })
+      });
+    },
   };
 };
