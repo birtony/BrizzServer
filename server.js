@@ -188,6 +188,15 @@ app.get(
     }
   }
 );
+app.post('/api/programs', passport.authenticate('jwt', { session: false}), (req, res) => {
+  m.programAdd(req.body)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((error) => {
+      res.status(500).json({"message": error});
+  })
+})
 
 // Attempt to Connect to the Database, Start Listening for Requests
 m.connect()
