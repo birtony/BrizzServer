@@ -153,7 +153,7 @@ module.exports = function(mongoDBConnectionString) {
       });
     },
 
-    // Get One Center By Id
+    // Get One Program By Id
     programGetById: function(itemId) {
       return new Promise(function(resolve, reject) {
         // Find One Specific Document
@@ -181,7 +181,35 @@ module.exports = function(mongoDBConnectionString) {
             return reject(error.message);
           }
           return resolve(object);
-        })
+        });
+      });
+    },
+
+    // Edit a Program
+    programEdit: function(someId) {
+      return new Promise(function(resolve, reject) {
+        Programs.findByIdAndUpdate(someId._id, someId, { new: true }, (error, object) => {
+          if (error) {
+            return reject(error.message);
+          }
+          if (object) {
+            return resolve(object);
+          } else {
+            return reject('Not found');
+          }
+        });
+      });
+    },
+
+    // Delete a Program
+    programDelete: function(someId) {
+      return new Promise(function(resolve, reject) {
+        Programs.findByIdAndRemove(someId, (error) => {
+          if (error) {
+            return reject(error.message);
+          }
+          return resolve();
+        });
       });
     },
   };
