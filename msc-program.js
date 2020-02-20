@@ -1,22 +1,18 @@
 // Setup
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Interests = require('./msc-interests.js');
 
 // Program Schema
-module.exports = new Schema({
+module.exports = new Scehma({
   id: Number,
   name: String,
-  address: String,
-  location: {
-    lat: Number,
-    lon: Number
-  },
+  campus: String,
   email: String,
+  tuition: String,
+  url: String,
+  duration: String,
   phone: String,
-  yearlyCost: Number,
   description: String,
-  requiredIelts: Number,
-  requiredGpa: Number,
-  interests: Interests
+  requiredIelts: {},
+  requirements: String,
 });
