@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // Program Schema
-module.exports = new Scehma({
+module.exports = new Schema({
   id: Number,
   name: String,
   campus: String,

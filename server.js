@@ -8,7 +8,7 @@ const HTTP_PORT = process.env.PORT || 8080;
 const manager = require('./manager.js');
 
 const m = manager(
-  'mongodb+srv://BrizzAdmin:You5iv3LkoJFF1cK@brizz-bodhi.mongodb.net/BrizzDB?retryWrites=true&w=majority',
+  'mongodb+srv://BrizzAdmin:sF0xMTodOoy7zaTG@brizz-bodhi.mongodb.net/BrizzDB?retryWrites=true&w=majority',
   { useUnifiedTopology: true }
 );
 
