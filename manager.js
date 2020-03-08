@@ -135,7 +135,6 @@ module.exports = function(mongoDBConnectionString) {
     },
 
     // *** Program Functions ***
-
     // Get All Programs
     programGetAll: function() {
       return new Promise(function(resolve, reject) {

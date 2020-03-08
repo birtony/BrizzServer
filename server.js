@@ -123,7 +123,7 @@ app.post('/api/users/login', (req, res) => {
         expiresIn: 1000 * 10000000,
       });
       // Return the result
-      res.json({ message: 'Login was successful', token: token });
+      res.json({ message: 'Login was successful', token: token, _id: data._id });
     })
     .catch((msg) => {
       res.status(400).json({ message: msg.message });
