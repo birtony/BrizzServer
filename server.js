@@ -37,13 +37,13 @@ jwtOptions.secretOrKey = 'big-long-string-from-lastpass.com/generatepassword.php
 // Add Support for Incoming JSON Entities
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   if (
     req.headers &&
     req.headers.authorization &&
     req.headers.authorization.split(' ')[0] === 'JWT'
   ) {
-    jwt.verify(req.headers.authorization.split(' ')[1], jwtOptions.secretOrKey, function(
+    jwt.verify(req.headers.authorization.split(' ')[1], jwtOptions.secretOrKey, function (
       err,
       decode
     ) {
@@ -57,9 +57,8 @@ app.use(function(req, res, next) {
   }
 });
 
-const strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
+const strategy = new JwtStrategy(jwtOptions, function (jwt_payload, next) {
   console.log('payload received', jwt_payload);
-
   if (jwt_payload) {
     // Attach the token's contents to the request
     // It will be available as "req.user" in the route handler functions
@@ -70,13 +69,13 @@ const strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
     next(null, false);
   }
 });
+
 // Activate the security system
 passport.use(strategy);
 app.use(passport.initialize());
 app.use(passport.session());
 
 // ***** User Methods *****
-
 // Get One User by Id
 app.get('/api/users/:userId', passport.authenticate('jwt', { session: false }), (req, res) => {
   // Call the Manager Method
@@ -151,8 +150,28 @@ app.post(
   }
 );
 
-// ***** Program Methods *****
+// User Update Temp Programs // debugged
+app.put(
+  '/api/users/:studentID/updateCourse',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      console.log(req.body);
+      m.userCartSave(req.params.studentID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
 
+// ***** Program Methods *****
 // Get All Programs
 app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req, res) => {
   if (req.user) {
