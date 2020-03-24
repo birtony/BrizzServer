@@ -152,7 +152,28 @@ app.post(
 
 // User Update Temp Programs // debugged
 app.put(
-  '/api/users/:studentID/updateCourse',
+  '/api/users/:studentID/updateProgramTemp',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      console.log(req.body);
+      m.userCartSave(req.params.studentID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+// User Update Temp Programs // debugged
+app.put(
+  '/api/users/:studentID/updateProgramFull',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
     if (req.user) {

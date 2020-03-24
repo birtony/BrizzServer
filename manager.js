@@ -134,7 +134,24 @@ module.exports = function (mongoDBConnectionString) {
       });
     },
 
-    //User Cart Save
+    //Full User Cart Save
+    userCartSave: function (_id, CourseArray) {
+      var wrappedItem = { "finalPrograms": CourseArray };
+      return new Promise(function (resolve, reject) {
+        Users.findByIdAndUpdate(_id, wrappedItem, { new: true }, (error, object) => {
+          if (error) {
+            return reject(error.message);
+          }
+          if (object) {
+            return resolve(object);
+          } else {
+            return reject('Not found');
+          }
+        });
+      });
+    },
+
+    //Temporary User Cart Save
     userCartSave: function (_id, CourseArray) {
       var wrappedItem = { "tempPrograms": CourseArray };
       return new Promise(function (resolve, reject) {
@@ -150,6 +167,7 @@ module.exports = function (mongoDBConnectionString) {
         });
       });
     },
+
 
     // *** Program Functions ***
     // Get All Programs
