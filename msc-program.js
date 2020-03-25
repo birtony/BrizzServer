@@ -13,6 +13,7 @@ module.exports = new Schema({
   duration: String,
   phone: String,
   description: String,
-  requiredIelts: {},
+  requiredIelts: Number,
   requirements: String,
+  categoryTag: String,
 });

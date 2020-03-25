@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
 const app = express();
 const HTTP_PORT = process.env.PORT || 8080;
 
@@ -77,15 +78,20 @@ app.use(passport.session());
 
 // ***** User Methods *****
 // Get One User by Id
-app.get('/api/users/:userId', passport.authenticate('jwt', { session: false }), (req, res) => {
-  // Call the Manager Method
-  m.usersGetById(req.params.userId)
-    .then((data) => {
-      res.json(data);
-    })
-    .catch(() => {
-      res.status(404).json({ message: 'Resource not found' });
-    });
+app.get('/api/users/:email', passport.authenticate('jwt', { session: false }), (req, res) => {
+  if (req.user) {
+    const { _id } = req.user;
+    // Call the Manager Method
+    m.usersGetById(_id)
+      .then((data) => {
+        res.json(data);
+      })
+      .catch(() => {
+        res.status(404).json({ message: 'Resource not found' });
+      });
+  } else {
+    res.status(401).json({ message: 'Not authorized' });
+  }
 });
 
 // User Create // debugged
@@ -150,6 +156,7 @@ app.post(
   }
 );
 
+// -------------------------------------- WHAT THE FUCK I THIS ??? --------------------------------------
 // User Update Temp Programs // debugged
 app.put(
   '/api/users/:studentID/updateProgramTemp',
@@ -171,6 +178,7 @@ app.put(
   }
 );
 
+// -------------------------------------- WHAT THE FUCK I THIS ??? --------------------------------------
 // User Update Temp Programs // debugged
 app.put(
   '/api/users/:studentID/updateProgramFull',
@@ -179,7 +187,7 @@ app.put(
     if (req.user) {
       // Call the manager method
       console.log(req.body);
-      m.userCartSave(req.params.studentID, req.body)
+      m.userCartSaveFinal(req.params.studentID, req.body)
         .then((data) => {
           res.json(data);
         })
@@ -192,6 +200,7 @@ app.put(
   }
 );
 
+
 // ***** Program Methods *****
 // Get All Programs
 app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -203,6 +212,24 @@ app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req,
       })
       .catch(() => {
         res.status(404).json({ message: 'Resource not found' });
+      });
+  } else {
+    res.status(401).json({ message: 'Not authorized' });
+  }
+});
+
+// Get Matched Programs
+app.get('/api/programs/:email', passport.authenticate('jwt', { session: false }), (req, res) => {
+  if (req.user) {
+    // Call the Manager Method
+    const { _id } = req.user;
+    m.programGetMatched(_id)
+      .then((data) => {
+        console.log('data');
+        res.json(data);
+      })
+      .catch((error) => {
+        res.status(404).json({ message: error });
       });
   } else {
     res.status(401).json({ message: 'Not authorized' });
@@ -262,6 +289,181 @@ app.delete('/api/programs/:programId', (req, res) => {
     });
 });
 
+// ***** Admin Methods *****
+// Get One Admin by Id
+app.get('/api/admins/:adminId', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // Call the Manager Method
+  m.adminGetById(req.params.adminId)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch(() => {
+      res.status(404).json({ message: 'Resource not found' });
+    });
+});
+
+// Admin Create // debugged
+app.post('/api/admins/create', (req, res) => {
+  m.adminRegister(req.body)
+    .then((data) => {
+      // Configure the payload with data and claims
+      const payload = {
+        _id: data._id,
+        email: data.email,
+      };
+
+      const token = jwt.sign(payload, jwtOptions.secretOrKey, {
+        expiresIn: 1000 * 10000000,
+      });
+
+      res.json({ message: data, token });
+    })
+    .catch((msg) => {
+      res.status(400).json({ message: msg.message });
+    });
+});
+
+// Admin Login // debugged
+app.post('/api/admins/login', (req, res) => {
+  m.adminLogin(req.body)
+    .then((data) => {
+      // Configure the payload with data and claims
+      const payload = {
+        _id: data._id,
+        email: data.email,
+      };
+      const token = jwt.sign(payload, jwtOptions.secretOrKey, {
+        expiresIn: 1000 * 10000000,
+      });
+      // Return the result
+      res.json({ message: 'Login was successful', token: token, _id: data._id });
+    })
+    .catch((msg) => {
+      res.status(400).json({ message: msg.message });
+    });
+});
+
+// Admin Update // debugged
+app.post(
+  '/api/admins/:email/update',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      const { _id } = req.user;
+      m.adminUpdate(_id, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+// Admin Update Temp Programs // debugged
+app.put(
+  '/api/admins/:adminID/updateProgramTemp',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      console.log(req.body);
+      m.adminCartSave(req.params.adminID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+// Admin Update Temp Programs // debugged
+app.put(
+  '/api/admins/:adminID/updateProgramFull',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      m.adminCartSaveFull(req.params.adminID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+// Admin Password Reset
+app.put('/api/admins/:passwordReset', (req, res) => {
+  var newPassword = makePassword(6);
+  m.adminPassReset(req.params.passwordReset, newPassword)
+    .then((data) => {
+      var transporter = nodemailer.createTransport({
+        service: 'outlook',
+        auth: {
+          user: 'devbrizz@hotmail.com',
+          pass: 'eIc^XxvzuPld',
+        },
+      });
+      var mailOptions = {
+        to: data.email,
+        from: 'devbrizz@hotmail.com',
+        subject: 'Admin Password Reset',
+        text:
+          'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          'Your new password is: ' +
+          newPassword +
+          '\n\n' +
+          'Use this Password as your new password to log into the Admin Website.\n',
+      };
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+      res.json(data);
+    })
+    .catch((msg) => {
+      res.status(404).json({ message: 'Resource not found' });
+    });
+});
+
+// -------------- Questionnaire --------------
+
+// save questionnaire results
+app.post(
+  '/api/users/:email/updateresults',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      const { _id } = req.user;
+      m.userSaveResults(_id, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
 // Attempt to Connect to the Database, Start Listening for Requests
 m.connect()
   .then(() => {
@@ -273,3 +475,13 @@ m.connect()
     console.log('Unable to start the server:\n' + err);
     process.exit();
   });
+
+function makePassword(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
