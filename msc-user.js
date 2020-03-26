@@ -31,5 +31,5 @@ module.exports = new Schema({
     default: 'UNDEFINED',
   },
   tempPrograms: [Program],
-  finalPrograms: [Program]
+  finalPrograms: [Program],
 });
