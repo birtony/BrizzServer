@@ -135,7 +135,7 @@ module.exports = function (mongoDBConnectionString) {
     },
 
     //Full User Cart Save
-    userCartSave: function (_id, CourseArray) {
+    userCartSaveFinal: function (_id, CourseArray) {
       var wrappedItem = { "finalPrograms": CourseArray };
       return new Promise(function (resolve, reject) {
         Users.findByIdAndUpdate(_id, wrappedItem, { new: true }, (error, object) => {
