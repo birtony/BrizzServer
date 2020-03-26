@@ -179,7 +179,7 @@ app.put(
     if (req.user) {
       // Call the manager method
       console.log(req.body);
-      m.userCartSave(req.params.studentID, req.body)
+      m.userCartSaveFull(req.params.studentID, req.body)
         .then((data) => {
           res.json(data);
         })
