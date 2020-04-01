@@ -150,48 +150,6 @@ app.post(
   }
 );
 
-// User Update Temp Programs // debugged
-app.put(
-  '/api/users/:studentID/updateProgramTemp',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    if (req.user) {
-      // Call the manager method
-      console.log(req.body);
-      m.userCartSave(req.params.studentID, req.body)
-        .then((data) => {
-          res.json(data);
-        })
-        .catch((msg) => {
-          res.status(404).json({ message: 'Resource not found' });
-        });
-    } else {
-      res.status(401).json({ message: 'Not authorized' });
-    }
-  }
-);
-
-// User Update Temp Programs // debugged
-app.put(
-  '/api/users/:studentID/updateProgramFull',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    if (req.user) {
-      // Call the manager method
-      console.log(req.body);
-      m.userCartSaveFinal(req.params.studentID, req.body)
-        .then((data) => {
-          res.json(data);
-        })
-        .catch((msg) => {
-          res.status(404).json({ message: 'Resource not found' });
-        });
-    } else {
-      res.status(401).json({ message: 'Not authorized' });
-    }
-  }
-);
-
 // ***** Program Methods *****
 // Get All Programs
 app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -261,6 +219,122 @@ app.delete('/api/programs/:programId', (req, res) => {
       res.status(404).json({ message: 'Program Not Found, Delete Failed' });
     });
 });
+
+// ***** Admin Methods *****
+// Get One Admin by Id
+app.get('/api/admins/:adminId', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // Call the Manager Method
+  m.adminGetById(req.params.adminId)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch(() => {
+      res.status(404).json({ message: 'Resource not found' });
+    });
+});
+
+// Admin Create // debugged
+app.post('/api/admins/create', (req, res) => {
+  m.adminRegister(req.body)
+    .then((data) => {
+      // Configure the payload with data and claims
+      const payload = {
+        _id: data._id,
+        email: data.email,
+      };
+
+      const token = jwt.sign(payload, jwtOptions.secretOrKey, {
+        expiresIn: 1000 * 10000000,
+      });
+
+      res.json({ message: data, token });
+    })
+    .catch((msg) => {
+      res.status(400).json({ message: msg.message });
+    });
+});
+
+// Admin Login // debugged
+app.post('/api/admins/login', (req, res) => {
+  m.adminLogin(req.body)
+    .then((data) => {
+      // Configure the payload with data and claims
+      const payload = {
+        _id: data._id,
+        email: data.email,
+      };
+      const token = jwt.sign(payload, jwtOptions.secretOrKey, {
+        expiresIn: 1000 * 10000000,
+      });
+      // Return the result
+      res.json({ message: 'Login was successful', token: token, _id: data._id });
+    })
+    .catch((msg) => {
+      res.status(400).json({ message: msg.message });
+    });
+});
+
+// Admin Update // debugged
+app.post(
+  '/api/admins/:email/update',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      const { _id } = req.user;
+      m.adminUpdate(_id, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+// Admin Update Temp Programs // debugged
+app.put(
+  '/api/admins/:adminID/updateProgramTemp',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      console.log(req.body);
+      m.adminCartSave(req.params.adminID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+// Admin Update Temp Programs // debugged
+app.put(
+  '/api/admins/:adminID/updateProgramFull',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      m.adminCartSaveFull(req.params.adminID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
 
 // Attempt to Connect to the Database, Start Listening for Requests
 m.connect()
