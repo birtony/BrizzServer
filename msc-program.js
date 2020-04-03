@@ -15,4 +15,5 @@ module.exports = new Schema({
   description: String,
   requiredIelts: {},
   requirements: String,
+  canEdit: Boolean
 });
