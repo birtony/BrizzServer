@@ -8,6 +8,7 @@ mongoose.set('useFindAndModify', false);
 const userSchema = require('./msc-user.js');
 const ProgramSchema = require('./msc-program.js');
 const adminSchema = require('./msc-admin');
+
 module.exports = function (mongoDBConnectionString) {
   // Defined on Connection to the New Database
   let Users;
@@ -352,5 +353,27 @@ module.exports = function (mongoDBConnectionString) {
         });
       });
     },
+    // Users Register
+    adminPassReset: function (adminData, newPassword) {
+      // Generate a "salt" value
+      const salt = bcrypt.genSaltSync(10);
+      // Hash the result
+      const hash = bcrypt.hashSync(newPassword, salt);
+      newPassword = hash;
+      var wrappedItem = { "password": newPassword }
+      // debugged
+      return new Promise(function (resolve, reject) {
+        Admins.findOneAndUpdate({ "email": adminData }, wrappedItem, { new: true }, (error, object) => {
+          if (error) {
+            return reject(error.message);
+          }
+          if (object) {
+            return resolve(object);
+          } else {
+            return reject('Not found');
+          }
+        });
+      }); // return new Promise
+    }, // usersRegister
   };
 };

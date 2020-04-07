@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
 const app = express();
 const HTTP_PORT = process.env.PORT || 8080;
 
@@ -335,6 +336,39 @@ app.put(
     }
   }
 );
+// Admin Password Reset
+app.put('/api/admins/:passwordReset', (req, res) => {
+  var newPassword = makePassword(6);
+  m.adminPassReset(req.params.passwordReset, newPassword)
+    .then((data) => {
+      var transporter = nodemailer.createTransport({
+        service: 'outlook',
+        auth: {
+          user: 'devbrizz@hotmail.com',
+          pass: 'eIc^XxvzuPld'
+        }
+      });
+      var mailOptions = {
+        to: data.email,
+        from: 'devbrizz@hotmail.com',
+        subject: 'Admin Password Reset',
+        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          'Your new password is: ' + newPassword + "\n\n" +
+          'Use this Password as your new password to log into the Admin Website.\n'
+      }
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      })
+      res.json(data);
+    })
+    .catch((msg) => {
+      res.status(404).json({ message: 'Resource not found' });
+    });
+});
 
 // Attempt to Connect to the Database, Start Listening for Requests
 m.connect()
@@ -347,3 +381,13 @@ m.connect()
     console.log('Unable to start the server:\n' + err);
     process.exit();
   });
+
+function makePassword(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
