@@ -137,6 +137,59 @@ module.exports = function (mongoDBConnectionString) {
       });
     },
 
+    // User Save results of the questionnaire
+    userSaveResults: function (_id, user) {
+      return new Promise(function (resolve, reject) {
+        Users.findByIdAndUpdate(_id, user, { new: true }, (error, item) => {
+          if (error) {
+            // Cannot edit item
+            return reject(error.message);
+          }
+          // Check for an item
+          if (item) {
+            // Success message will be returned
+            return resolve('User updated');
+          } else {
+            return reject(new Error('Not found'));
+          }
+        });
+      });
+    },
+
+    //Full User Cart Save
+    userCartSaveFinal: function (_id, CourseArray) {
+      var wrappedItem = { finalPrograms: CourseArray };
+      return new Promise(function (resolve, reject) {
+        Users.findByIdAndUpdate(_id, wrappedItem, { new: true }, (error, object) => {
+          if (error) {
+            return reject(error.message);
+          }
+          if (object) {
+            return resolve(object);
+          } else {
+            return reject('Not found');
+          }
+        });
+      });
+    },
+
+    //Temporary User Cart Save
+    userCartSave: function (_id, CourseArray) {
+      var wrappedItem = { tempPrograms: CourseArray };
+      return new Promise(function (resolve, reject) {
+        Users.findByIdAndUpdate(_id, wrappedItem, { new: true }, (error, object) => {
+          if (error) {
+            return reject(error.message);
+          }
+          if (object) {
+            return resolve(object);
+          } else {
+            return reject('Not found');
+          }
+        });
+      });
+    },
+
     // *** Program Functions ***
     // Get All Programs
     programGetAll: function () {
@@ -151,6 +204,121 @@ module.exports = function (mongoDBConnectionString) {
             }
             // If Found, a Collection Will Be Returned
             return resolve(items);
+          });
+      });
+    },
+
+    // Get Matched Programs
+    programGetMatched: function (userID) {
+      return new Promise(function (resolve, reject) {
+        let tag, user;
+
+        async function getUser() {
+          let promise = new Promise(function (resolve, reject) {
+            Users.findById(userID, (error, item) => {
+              if (error) {
+                // Match Is Not Found
+                console.log('1 ne nashel usera');
+                reject(error.message);
+              }
+              // Check For an Item
+              if (item) {
+                // If Found, One Object Will Be Returned
+                user = item;
+                resolve(item);
+              } else {
+                console.log('hz');
+                reject(new Error('User not found'));
+              }
+            });
+          });
+
+          let result = await promise;
+          return result;
+        }
+
+        getUser()
+          .then(() => {
+            let results = [],
+              data = [],
+              part1 = [],
+              part2 = [],
+              part3 = [],
+              part4 = [];
+
+            async function getPrograms() {
+              let getPart1 = new Promise(function (resolve, reject) {
+                tag = user.interests.i1.raisecTag[0];
+                console.log('p1 tag = ' + tag);
+
+                // Fetch Documents that match first interest
+                tag = '^' + tag;
+                let re = new RegExp(tag);
+                Programs.find({ categoryTag: { $regex: re } })
+                  .sort({ name: 'asc' })
+                  .exec((error, items) => {
+                    data = items;
+                    //console.log('items 1 = ' + items);
+
+                    resolve(1);
+                  });
+              });
+
+              let getPart2 = new Promise(function (resolve, reject) {
+                tag = user.interests.i2.raisecTag[0] + user.interests.i1.raisecTag[0];
+                console.log('p2 tag = ' + tag);
+
+                tag = '^' + tag;
+                let re = new RegExp(tag);
+                // Fetch Documents that match first two interests swapped
+                Programs.find({ categoryTag: { $regex: re } })
+                  .sort({ name: 'asc' })
+                  .exec((error, items) => {
+                    if (error) reject(error);
+
+                    part2 = items;
+                    //console.log('items 2 = ' + items);
+                    resolve(1);
+                  });
+              });
+
+              await getPart1;
+              await getPart2;
+
+              console.log('data1 = ' + data);
+              console.log('data2 = ' + part2);
+
+              return;
+            }
+
+            getPrograms()
+              .then(() => {
+                console.log('data =' + data);
+
+                for (itm of data) {
+                  if (itm.categoryTag[1] === user.interests.i2.raisecTag[0]) {
+                    if (itm.categoryTag[2] === user.interests.i3.raisecTag[0]) {
+                      part1.push(itm);
+                    } else {
+                      part3.push(itm);
+                    }
+                  } else {
+                    part4.push(itm);
+                  }
+                }
+
+                results = [...part1, ...part3, ...part2, ...part4];
+
+                if (results.length === 0) {
+                  return reject('No Programs Found');
+                } else return resolve(results);
+              })
+              .catch((error) => {
+                return reject(error);
+              });
+          })
+          .catch((error) => {
+            return reject(error);
           });
       });
     },

@@ -1,40 +1,14 @@
 // Setup
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Result = require('./msc-result.js');
 
 // Interests Schema
 module.exports = new Schema({
-  accounting: Boolean,
-  administration: Boolean,
-  acting: Boolean,
-  arts: Boolean,
-  aviation: Boolean,
-  broadcasting: Boolean,
-  business: Boolean,
-  chemistry: Boolean,
-  civilEngineering: Boolean,
-  computerNetworking: Boolean,
-  cosmetics: Boolean,
-  legal: Boolean,
-  programming: Boolean,
-  childhoodEducation: Boolean,
-  electronics: Boolean,
-  fashion: Boolean,
-  fireProtection: Boolean,
-  fitness: Boolean,
-  flightServices: Boolean,
-  hospitality: Boolean,
-  mediaDesign: Boolean,
-  journalism: Boolean,
-  justice: Boolean,
-  law: Boolean,
-  mechanicalEngineering: Boolean,
-  opticianry: Boolean,
-  paralegal: Boolean,
-  photography: Boolean,
-  police: Boolean,
-  nursing: Boolean,
-  socialService: Boolean,
-  tourism: Boolean,
-  veterinary: Boolean
+  i1: Result,
+  i2: Result,
+  i3: Result,
+  i4: Result,
+  i5: Result,
+  i6: Result,
 });

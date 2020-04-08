@@ -78,15 +78,20 @@ app.use(passport.session());
 
 // ***** User Methods *****
 // Get One User by Id
-app.get('/api/users/:userId', passport.authenticate('jwt', { session: false }), (req, res) => {
-  // Call the Manager Method
-  m.usersGetById(req.params.userId)
-    .then((data) => {
-      res.json(data);
-    })
-    .catch(() => {
-      res.status(404).json({ message: 'Resource not found' });
-    });
+app.get('/api/users/:email', passport.authenticate('jwt', { session: false }), (req, res) => {
+  if (req.user) {
+    const { _id } = req.user;
+    // Call the Manager Method
+    m.usersGetById(_id)
+      .then((data) => {
+        res.json(data);
+      })
+      .catch(() => {
+        res.status(404).json({ message: 'Resource not found' });
+      });
+  } else {
+    res.status(401).json({ message: 'Not authorized' });
+  }
 });
 
 // User Create // debugged
@@ -151,6 +156,51 @@ app.post(
   }
 );
 
+// -------------------------------------- WHAT THE FUCK I THIS ??? --------------------------------------
+// User Update Temp Programs // debugged
+app.put(
+  '/api/users/:studentID/updateProgramTemp',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      console.log(req.body);
+      m.userCartSave(req.params.studentID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+// -------------------------------------- WHAT THE FUCK I THIS ??? --------------------------------------
+// User Update Temp Programs // debugged
+app.put(
+  '/api/users/:studentID/updateProgramFull',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      console.log(req.body);
+      m.userCartSaveFinal(req.params.studentID, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
+
+
 // ***** Program Methods *****
 // Get All Programs
 app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -162,6 +212,24 @@ app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req,
       })
       .catch(() => {
         res.status(404).json({ message: 'Resource not found' });
+      });
+  } else {
+    res.status(401).json({ message: 'Not authorized' });
+  }
+});
+
+// Get Matched Programs
+app.get('/api/programs/:email', passport.authenticate('jwt', { session: false }), (req, res) => {
+  if (req.user) {
+    // Call the Manager Method
+    const { _id } = req.user;
+    m.programGetMatched(_id)
+      .then((data) => {
+        console.log('data');
+        res.json(data);
+      })
+      .catch((error) => {
+        res.status(404).json({ message: error });
       });
   } else {
     res.status(401).json({ message: 'Not authorized' });
@@ -345,30 +413,56 @@ app.put('/api/admins/:passwordReset', (req, res) => {
         service: 'outlook',
         auth: {
           user: 'devbrizz@hotmail.com',
-          pass: 'eIc^XxvzuPld'
-        }
+          pass: 'eIc^XxvzuPld',
+        },
       });
       var mailOptions = {
         to: data.email,
         from: 'devbrizz@hotmail.com',
         subject: 'Admin Password Reset',
-        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-          'Your new password is: ' + newPassword + "\n\n" +
-          'Use this Password as your new password to log into the Admin Website.\n'
-      }
+        text:
+          'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+          'Your new password is: ' +
+          newPassword +
+          '\n\n' +
+          'Use this Password as your new password to log into the Admin Website.\n',
+      };
       transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.log(error);
         } else {
           console.log('Email sent: ' + info.response);
         }
-      })
+      });
       res.json(data);
     })
     .catch((msg) => {
       res.status(404).json({ message: 'Resource not found' });
     });
 });
+
+// -------------- Questionnaire --------------
+
+// save questionnaire results
+app.post(
+  '/api/users/:email/updateresults',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user) {
+      // Call the manager method
+      const { _id } = req.user;
+      m.userSaveResults(_id, req.body)
+        .then((data) => {
+          res.json(data);
+        })
+        .catch((msg) => {
+          res.status(404).json({ message: 'Resource not found' });
+        });
+    } else {
+      res.status(401).json({ message: 'Not authorized' });
+    }
+  }
+);
 
 // Attempt to Connect to the Database, Start Listening for Requests
 m.connect()

@@ -30,6 +30,4 @@ module.exports = new Schema({
     enum: ['UNDEFINED', '1k-5k', '5k-10k', '10k-15k', '15k-20k', '20k-25k', '25k+'],
     default: 'UNDEFINED',
   },
-  tempPrograms: [Program],
-  finalPrograms: [Program],
 });
