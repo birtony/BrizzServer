@@ -156,7 +156,7 @@ app.post(
   }
 );
 
-// -------------------------------------- WHAT THE FUCK I THIS ??? --------------------------------------
+// -------------------------------------- WHAT THE FUCK I THIS ?? --------------------------------------
 // User Update Temp Programs // debugged
 app.put(
   '/api/users/:studentID/updateProgramTemp',
@@ -178,7 +178,7 @@ app.put(
   }
 );
 
-// -------------------------------------- WHAT THE FUCK I THIS ??? --------------------------------------
+// -------------------------------------- WHAT THE FUCK I THIS ?? --------------------------------------
 // User Update Temp Programs // debugged
 app.put(
   '/api/users/:studentID/updateProgramFull',
