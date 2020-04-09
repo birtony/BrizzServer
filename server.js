@@ -156,51 +156,6 @@ app.post(
   }
 );
 
-// -------------------------------------- WHAT THE FUCK I THIS ?? --------------------------------------
-// User Update Temp Programs // debugged
-app.put(
-  '/api/users/:studentID/updateProgramTemp',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    if (req.user) {
-      // Call the manager method
-      console.log(req.body);
-      m.userCartSave(req.params.studentID, req.body)
-        .then((data) => {
-          res.json(data);
-        })
-        .catch((msg) => {
-          res.status(404).json({ message: 'Resource not found' });
-        });
-    } else {
-      res.status(401).json({ message: 'Not authorized' });
-    }
-  }
-);
-
-// -------------------------------------- WHAT THE FUCK I THIS ?? --------------------------------------
-// User Update Temp Programs // debugged
-app.put(
-  '/api/users/:studentID/updateProgramFull',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    if (req.user) {
-      // Call the manager method
-      console.log(req.body);
-      m.userCartSaveFinal(req.params.studentID, req.body)
-        .then((data) => {
-          res.json(data);
-        })
-        .catch((msg) => {
-          res.status(404).json({ message: 'Resource not found' });
-        });
-    } else {
-      res.status(401).json({ message: 'Not authorized' });
-    }
-  }
-);
-
-
 // ***** Program Methods *****
 // Get All Programs
 app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req, res) => {
