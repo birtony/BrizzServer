@@ -156,40 +156,6 @@ module.exports = function (mongoDBConnectionString) {
       });
     },
 
-    //Full User Cart Save
-    userCartSaveFinal: function (_id, CourseArray) {
-      var wrappedItem = { finalPrograms: CourseArray };
-      return new Promise(function (resolve, reject) {
-        Users.findByIdAndUpdate(_id, wrappedItem, { new: true }, (error, object) => {
-          if (error) {
-            return reject(error.message);
-          }
-          if (object) {
-            return resolve(object);
-          } else {
-            return reject('Not found');
-          }
-        });
-      });
-    },
-
-    //Temporary User Cart Save
-    userCartSave: function (_id, CourseArray) {
-      var wrappedItem = { tempPrograms: CourseArray };
-      return new Promise(function (resolve, reject) {
-        Users.findByIdAndUpdate(_id, wrappedItem, { new: true }, (error, object) => {
-          if (error) {
-            return reject(error.message);
-          }
-          if (object) {
-            return resolve(object);
-          } else {
-            return reject('Not found');
-          }
-        });
-      });
-    },
-
     // *** Program Functions ***
     // Get All Programs
     programGetAll: function () {
@@ -212,7 +178,6 @@ module.exports = function (mongoDBConnectionString) {
     programGetMatched: function (userID) {
       return new Promise(function (resolve, reject) {
         let tag, user;
-
         async function getUser() {
           let promise = new Promise(function (resolve, reject) {
             Users.findById(userID, (error, item) => {
@@ -384,18 +349,15 @@ module.exports = function (mongoDBConnectionString) {
     },
 
     // Admin Functions
-    // Get One User By Id
+
+    // Admin Get By ID
     adminGetById: function (itemId) {
       return new Promise(function (resolve, reject) {
-        // Find One Specific Document
         Admins.findById(itemId, (error, item) => {
           if (error) {
-            // Match Is Not Found
             return reject(error.message);
           }
-          // Check For an Item
           if (item) {
-            // If Found, One Object Will Be Returned
             return resolve(item);
           } else {
             return reject(new Error('Not found'));
@@ -404,31 +366,16 @@ module.exports = function (mongoDBConnectionString) {
       });
     },
 
-    // Users Register
+    // Admin Register
     adminRegister: function (adminData) {
-      // debugged
       return new Promise(function (resolve, reject) {
-        // Incoming data package has user name (email address), full name,
-        // two identical passwords
-        // { email: xxx, password: yyy, passwordConfirm: yyy }
-
-        // check if passwords match
         if (adminData.password !== adminData.passwordConfirm) {
           return reject(new Error('Passwords do not match'));
         }
-
-        // Generate a "salt" value
         const salt = bcrypt.genSaltSync(10);
-        // Hash the result
         const hash = bcrypt.hashSync(adminData.password, salt);
-
-        // Update the incoming data
         adminData.password = hash;
-
-        // Create a new user account document
         const newAdmin = new Admins(adminData);
-
-        // Attempt to save
         newAdmin.save((error) => {
           if (error) {
             if (error.code === 11000) {
@@ -439,23 +386,18 @@ module.exports = function (mongoDBConnectionString) {
           } else {
             resolve(newAdmin);
           }
-        }); // newAdmin.save
-      }); // return new Promise
-    }, // adminRegister
+        });
+      });
+    },
 
-    // Users login // debugged
+    // Admin login // debugged
     adminLogin: function (adminData) {
       return new Promise(function (resolve, reject) {
-        // Incoming data package has user name (email address) and password
-        // { email: xxx, password: yyy }
         Admins.findOne({ email: adminData.email }, (error, item) => {
           if (error) {
-            // Query error
             return reject(new Error(`Login - ${error.message}`));
           }
-          // Check for an item
           if (item) {
-            // Compare password with stored value
             const isPasswordMatch = bcrypt.compareSync(adminData.password, item.password);
             if (isPasswordMatch) {
               return resolve(item);
@@ -465,22 +407,19 @@ module.exports = function (mongoDBConnectionString) {
           } else {
             return reject(new Error('Login - not found'));
           }
-        }); // Users.findOneAndUpdate
-      }); // return new Promise
-    }, // adminLogin
+        });
+      });
+    },
 
-    // User Update // debugged
+    // Admin Update // debugged
     adminUpdate: function (_id, admin) {
       return new Promise(function (resolve, reject) {
         Admins.findByIdAndUpdate(_id, admin, { new: true }, (error, item) => {
           if (error) {
-            // Cannot edit item
             return reject(error.message);
           }
-          // Check for an item
           if (item) {
-            // Success message will be returned
-            return resolve('Admin updated');
+            return resolve('Admin updated!');
           } else {
             return reject(new Error('Not found'));
           }
@@ -488,7 +427,7 @@ module.exports = function (mongoDBConnectionString) {
       });
     },
 
-    //Full User Cart Save
+    //Full Admin Cart Save
     adminCartSaveFull: function (_id, CourseArray) {
       var wrappedItem = { "finalPrograms": CourseArray };
       return new Promise(function (resolve, reject) {
@@ -505,7 +444,7 @@ module.exports = function (mongoDBConnectionString) {
       });
     },
 
-    //Temporary User Cart Save
+    //Temporary Admin Cart Save
     adminCartSave: function (_id, CourseArray) {
       var wrappedItem = { "tempPrograms": CourseArray };
       return new Promise(function (resolve, reject) {
@@ -521,15 +460,13 @@ module.exports = function (mongoDBConnectionString) {
         });
       });
     },
-    // Users Register
+
+    // Admin Password Reset
     adminPassReset: function (adminData, newPassword) {
-      // Generate a "salt" value
       const salt = bcrypt.genSaltSync(10);
-      // Hash the result
       const hash = bcrypt.hashSync(newPassword, salt);
       newPassword = hash;
       var wrappedItem = { "password": newPassword }
-      // debugged
       return new Promise(function (resolve, reject) {
         Admins.findOneAndUpdate({ "email": adminData }, wrappedItem, { new: true }, (error, object) => {
           if (error) {
@@ -541,7 +478,7 @@ module.exports = function (mongoDBConnectionString) {
             return reject('Not found');
           }
         });
-      }); // return new Promise
-    }, // usersRegister
+      });
+    },
   };
 };
