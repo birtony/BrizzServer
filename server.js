@@ -174,7 +174,7 @@ app.get('/api/programs', passport.authenticate('jwt', { session: false }), (req,
 });
 
 // Get Matched Programs
-app.get('/api/programs/:email', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/api/programs/matchedprograms/:email', passport.authenticate('jwt', { session: false }), (req, res) => {
   if (req.user) {
     // Call the Manager Method
     const { _id } = req.user;
