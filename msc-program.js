@@ -16,4 +16,5 @@ module.exports = new Schema({
   requiredIelts: Number,
   requirements: String,
   categoryTag: String,
+  editable: Boolean,
 });
